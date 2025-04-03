@@ -13,12 +13,12 @@
 </head>
 
 <body>
-    <button class="menu-btn" onclick="toggleMenu()">☰</button>
     <div class="profile-container">
         {% if username %}
         <button class="profile-icon" onclick="toggleDropdown()">👤</button>
         <div class="dropdown" id="profile-dropdown">
             <span style="padding: 8px 12px; display: block;">{{ username }}</span>
+            <!-- <button onclick="toggleTheme()">Dark Mode 🌙</button> -->
             <a href="/logout">Logout</a>
         </div>
         {% else %}
@@ -28,9 +28,10 @@
         </div>
         {% endif %}
     </div>
-    <div class="explore-grid" id="explore-menu">
+    <div class="explore-grid">
         {% for project in projects %}
         <div class="project-card">
+            <!-- <img src="/assets/android.png" alt="Project Preview" /> -->
             <div class="project-info">
                 <h3>{{ project.app_name }}</h3>
                 <p>Created on {{ project.created_at[:10] }}</p>
@@ -44,6 +45,13 @@
         <h1>XenoAI V1.0.12</h1>
         {% if username %}
         <form id="generate-form" method="POST" action="/generate" class="input-section">
+            <textarea id="prompt" name="prompt" placeholder="Create your own app (e.g., A simple todo list app)"
+                required></textarea>
+            <div class="button-group">
+                <input type="submit" value="Generate App">
+                <button type="button" id="customize-btn">Customize</button>
+            </div>
+            <!-- In the customize-form div, add this new form-field before the button-group -->
             <div id="customize-form">
                 <div class="form-field">
                     <label for="app-name">App Name:</label>
@@ -72,25 +80,21 @@
                     <input type="submit" value="Generate with Custom Settings">
                 </div>
             </div>
-            <div id="code-display-container">
-                <div class="code-output">
-                    <h2>Building your app...</h2>
-                    <pre id="code-output" class="code-block"></pre>
-                    <div class="button-group">
-                        <button id="cancel-btn">Cancel</button>
-                    </div>
-                </div>
-            </div>
-            <textarea id="prompt" name="prompt" placeholder="Create your own app (e.g., A simple todo list app)"
-                required></textarea>
-            <div class="button-group">
-                <input type="submit" value="Generate App">
-                <button type="button" id="customize-btn">Customize</button>
-            </div>
         </form>
         {% else %}
         <p>Please <a href="/login">login</a> or <a href="/signup">sign up</a> to generate an app.</p>
         {% endif %}
+    </div>
+
+    <div id="code-display-container">
+        <div class="code-output">
+            <h2>Building your app...</h2>
+            <pre id="code-output" class="code-block"></pre>
+            <div class="button-group">
+                <button id="cancel-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <div id="api-key-modal">
@@ -106,6 +110,87 @@
     </div>
 
     <script>
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const pageContent = document.querySelector('.page-content');
+            pageContent.classList.add('loaded');
+        });
+
+        // Example prompts for the typing animation
+        const examplePrompts = [
+            "Create a simple todo list app",
+            "Build a weather app with real-time updates",
+            "Generate a calculator app with basic functions",
+            "Design a note-taking app with categories"
+        ];
+
+        let currentPromptIndex = 0;
+        let isTyping = true;
+        let placeholderText = '';
+        const promptTextarea = document.getElementById('prompt');
+
+        // Function to simulate typing for placeholder
+        function typePlaceholder(prompt, element, speed = 100, callback) {
+            let i = 0;
+            placeholderText = '';
+
+            function type() {
+                if (i < prompt.length) {
+                    placeholderText += prompt.charAt(i);
+                    element.setAttribute('placeholder', placeholderText);
+                    i++;
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    setTimeout(callback, 1000); // Pause before moving to next prompt
+                }
+            }
+            type();
+        }
+
+        // Function to erase placeholder
+        function erasePlaceholder(element, speed = 50, callback) {
+            function erase() {
+                if (placeholderText.length > 0) {
+                    placeholderText = placeholderText.slice(0, -1);
+                    element.setAttribute('placeholder', placeholderText);
+                    setTimeout(erase, speed);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            erase();
+        }
+
+        // Cycle through example prompts
+        function cyclePrompts() {
+            if (!promptTextarea.value) { // Only run if textarea is empty
+                const currentPrompt = examplePrompts[currentPromptIndex];
+                typePlaceholder(currentPrompt, promptTextarea, 100, () => {
+                    erasePlaceholder(promptTextarea, 50, () => {
+                        currentPromptIndex = (currentPromptIndex + 1) % examplePrompts.length;
+                        cyclePrompts();
+                    });
+                });
+            }
+        }
+
+        // Start the animation when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            cyclePrompts();
+        });
+
+        // Stop animation when user focuses on the textarea
+        promptTextarea.addEventListener('focus', () => {
+            promptTextarea.setAttribute('placeholder', '');
+        });
+
+        // Restart animation if textarea is emptied
+        promptTextarea.addEventListener('input', () => {
+            if (!promptTextarea.value) {
+                cyclePrompts();
+            }
+        });
+
         document.getElementById('customize-btn') && document.getElementById('customize-btn').addEventListener('click', function () {
             const form = document.getElementById('customize-form');
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
@@ -124,11 +209,6 @@
         function toggleDropdown() {
             const dropdown = document.getElementById('profile-dropdown');
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleMenu() {
-            const menu = document.getElementById('explore-menu');
-            menu.classList.toggle('active');
         }
 
         let formData;
@@ -151,6 +231,7 @@
                 if (i < text.length) {
                     element.textContent += text.charAt(i);
                     i++;
+                    // Scroll to the bottom of the element
                     element.scrollTop = element.scrollHeight;
                     setTimeout(type, speed);
                 } else if (callback) {
@@ -179,7 +260,9 @@
                     } else if (data.code) {
                         const codeOutput = document.getElementById('code-output');
                         codeOutput.textContent = '';
+                        // Show typing animation and start build simultaneously
                         typeText(codeOutput, data.code, 10);
+                        // Automatically trigger build
                         formData.append('continue_build', 'true');
                         fetch('/generate', {
                             method: 'POST',

@@ -1,4 +1,4 @@
-/* Reset and Base Styles */
+/* static/index.css */
 * {
     margin: 0;
     padding: 0;
@@ -9,6 +9,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
     background-color: #000000;
     background-image: url("https://www.transparenttextures.com/patterns/dark-mosaic.png");
+    /* This is mostly intended for prototyping; please download the pattern and re-host for production environments. Thank you! */
     color: #ffffff;
     line-height: 1.5;
     display: flex;
@@ -16,12 +17,25 @@ body {
     overflow: hidden;
 }
 
+.page-content {
+    opacity: 0;
+    transform: scale(0.8);
+    /* Start zoomed out */
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    /* Smooth transition */
+}
+
+.page-content.loaded {
+    opacity: 1;
+    transform: scale(1);
+    /* Zoom in to normal size */
+}
+
 body[data-theme="dark"] {
     background-color: #202123;
     color: #d1d5db;
 }
 
-/* Logo Container */
 .logo-container {
     position: fixed;
     top: 100px;
@@ -30,18 +44,25 @@ body[data-theme="dark"] {
     z-index: 1000;
     padding: 15px;
     width: 100%;
+    /* Allow full width for centering */
     max-width: 400px;
+    /* Increased for a larger container */
     transition: margin-right 0.3s ease, transform 0.3s ease;
+    /* Smooth transition for movement */
     text-align: center;
+    /* Center the logo within the container */
 }
 
 body:has(#code-display-container[style*="display: block"]) .logo-container {
     margin-right: 40%;
+    /* Shift left by matching code-display-container width */
     transform: translateX(-50%) translateX(-20px);
+    /* Adjust for padding/margin offset */
 }
 
 .logo {
     max-width: 300px;
+    /* Increased from 250px to make it bigger */
     height: auto;
 }
 
@@ -103,22 +124,7 @@ body[data-theme="dark"] .dropdown button:hover {
     background-color: #50515f;
 }
 
-/* Sandwich Menu Button */
-.menu-btn {
-    display: none;
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #ffffff;
-    cursor: pointer;
-    padding: 5px;
-    z-index: 1001;
-}
-
-/* Explore Grid (Dropdown) */
+/* Sidebar (Explore Grid) */
 .explore-grid {
     width: 260px;
     background-color: #1b1a1a;
@@ -186,15 +192,25 @@ body[data-theme="dark"] .username {
     padding: 20px;
     overflow-y: auto;
     position: relative;
+    /* Ensure proper positioning context */
     width: 100%;
+    /* Full width by default */
     transition: margin-right 0.3s ease;
+    /* Smooth transition when code container appears */
 }
 
 body:has(#code-display-container[style*="display: block"]) .header {
     margin-right: 40%;
+    /* Matches the width of code-display-container */
 }
 
-/* Customize Form */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* Customize Form - Positioned above input-section */
 #customize-form {
     display: none;
     margin-top: -630px;
@@ -203,13 +219,13 @@ body:has(#code-display-container[style*="display: block"]) .header {
     padding: 15px;
     border-radius: 4px;
     width: 50%;
+    /* Adjust based on preference */
     max-width: 100%;
     transition: max-width 0.3s ease;
     margin-left: auto;
     margin-right: auto;
     text-align: center;
-    position: relative;
-    z-index: 999;
+    /* Optional: Centers inline content inside */
 }
 
 body[data-theme="dark"] #customize-form {
@@ -218,28 +234,34 @@ body[data-theme="dark"] #customize-form {
 
 body:has(#code-display-container[style*="display: block"]) #customize-form {
     max-width: calc(100% - 20px);
+    /* Resize with input-section */
 }
 
-/* Input Section */
+/* Input Section - Keep original position */
 .input-section {
     max-width: 100%;
+    /* Initially full width */
     margin-top: 600px;
+    /* Keep original large top margin */
     transition: max-width 0.3s ease;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0;
+    /* Smooth resizing */
 }
 
 body:has(#code-display-container[style*="display: block"]) .input-section {
     max-width: calc(100% - 20px);
+    /* Leaves space for code-display-container (40% width + padding) */
 }
 
 textarea {
     width: 100%;
+    /* Always takes full width of its container */
     min-height: 100px;
-    padding: 20px;
+    padding: 10px;
+    padding-left: 15px;
     border: 3px solid #dcdcdc;
     font-size: 16px;
+    outline: none;
     font-family: "Roboto", sans-serif;
     font-weight: 400;
     border-radius: 25px;
@@ -247,6 +269,7 @@ textarea {
     background-color: rgb(27, 27, 27);
     color: #ffffff;
     box-sizing: border-box;
+    /* Ensure padding doesn’t affect width */
 }
 
 body[data-theme="dark"] textarea {
@@ -397,18 +420,18 @@ body[data-theme="dark"] .modal-content input {
     color: #d1d5db;
 }
 
-/* Scrollbar */
 ::-webkit-scrollbar {
     display: none;
 }
 
-/* Code Display Container (Desktop Default) */
 #code-display-container {
     position: fixed;
     top: 0;
     right: 0;
     width: 40%;
+    /* Fixed width for split screen */
     height: 100vh;
+    /* Full height */
     background-color: #000000;
     background-image: url("https://www.transparenttextures.com/patterns/dark-mosaic.png");
     padding: 20px;
@@ -431,6 +454,7 @@ body[data-theme="dark"] .modal-content input {
     border-radius: 4px;
     white-space: pre-wrap;
     flex-grow: 1;
+    /* Takes available space */
     overflow-y: auto;
 }
 
@@ -447,197 +471,4 @@ body[data-theme="dark"] #code-display-container {
 body[data-theme="dark"] .code-block {
     background: #222;
     color: #0f0;
-}
-
-/* Mobile-Specific Optimizations */
-@media (max-width: 768px) {
-    body {
-        flex-direction: column;
-        overflow-y: auto;
-        height: auto;
-        /* Allow scrolling */
-    }
-
-    .menu-btn {
-        display: block;
-    }
-
-    .explore-grid {
-        display: none;
-        position: absolute;
-        top: 40px;
-        left: 0;
-        width: 100%;
-        max-width: 260px;
-        border-right: none;
-        border-bottom: 1px solid #e5e5e5;
-        z-index: 1000;
-    }
-
-    .explore-grid.active {
-        display: block;
-    }
-
-    body[data-theme="dark"] .explore-grid {
-        border-left: none;
-        border-bottom: 1px solid #40414f;
-    }
-
-    .logo-container {
-        position: relative;
-        top: 0;
-        left: 0;
-        transform: none;
-        padding: 10px;
-        max-width: none;
-        transition: none;
-    }
-
-    body:has(#code-display-container[style*="display: block"]) .logo-container {
-        margin-right: 0;
-        transform: none;
-    }
-
-    .logo {
-        max-width: 200px;
-    }
-
-    .profile-icon {
-        font-size: 20px;
-        padding: 8px;
-    }
-
-    .dropdown {
-        min-width: 120px;
-    }
-
-    .header {
-        padding: 15px;
-        transition: none;
-        flex-grow: 1;
-        /* Allow header to take available space */
-    }
-
-    body:has(#code-display-container[style*="display: block"]) .header {
-        margin-right: 0;
-    }
-
-    h1 {
-        font-size: 20px;
-        margin-bottom: 15px;
-    }
-
-    /* Input Section Adjustments */
-    .input-section {
-        margin-top: 20px;
-        transition: none;
-        position: relative;
-        min-height: 100vh;
-        /* Full screen height */
-        padding-bottom: 120px;
-        /* Space for textarea */
-    }
-
-    body:has(#code-display-container[style*="display: block"]) .input-section {
-        max-width: 100%;
-    }
-
-    /* Customize Form on Mobile */
-    #customize-form {
-        margin-top: 0;
-        padding: 10px;
-        width: 100%;
-        position: relative;
-        top: 0;
-    }
-
-    body:has(#code-display-container[style*="display: block"]) #customize-form {
-        max-width: 100%;
-    }
-
-    /* Code Display Container on Mobile */
-    #code-display-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: calc(100% - 120px);
-        /* Full height minus textarea */
-        background-color: rgba(0, 0, 0, 0.9);
-        padding: 15px;
-        box-shadow: none;
-        overflow-y: auto;
-    }
-
-    .code-block {
-        padding: 10px;
-        font-size: 13px;
-    }
-
-    /* Textarea on Mobile */
-    textarea {
-        min-height: 100px;
-        padding: 15px;
-        border: 2px solid #dcdcdc;
-        font-size: 14px;
-        border-radius: 15px;
-        resize: vertical;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-    }
-
-    .button-group {
-        position: absolute;
-        bottom: 110px;
-        /* Above textarea */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        padding: 0 15px;
-    }
-
-    input[type="submit"],
-    button {
-        padding: 10px 20px;
-        min-width: 100px;
-    }
-
-    .form-field {
-        margin-bottom: 12px;
-    }
-
-    .form-field label {
-        font-size: 13px;
-    }
-
-    .form-field input,
-    .form-field select {
-        padding: 6px;
-        font-size: 14px;
-    }
-
-    ::-webkit-scrollbar {
-        display: block;
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
-    .modal-content {
-        padding: 15px;
-        max-width: 90%;
-    }
-
-    .modal-content h2 {
-        font-size: 18px;
-    }
 }
